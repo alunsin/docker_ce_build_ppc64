@@ -8,9 +8,19 @@
 make[1]: *** [debian/rules:11: override_dh_auto_build] Error 128
 # - ubuntu-hirsute, #8 2.894 Err:4 http://ports.ubuntu.com/ubuntu-ports hirsute-security InRelease
 #8 2.894   gpgv, gpgv2 or gpgv1 required for verification, but neither seems installed
-#
-# rm -rf cli docker-ce-packaging moby scan-cli-plugin
-#nohup bash -x mybuild.sh > logs.out 2>&1 & sleep 1; tail -f logs.out
+##
+
+##
+# How to run
+# 1) Run a docker in docker container + mount a docker-ce directory as the ouput directory for the build packages
+#   $ mkdir docker-ce
+#   $:~$ docker run -d -v ~/docker-ce:/docker-ce  --privileged  --name docker-build quay.io/alunsin/all_in_one_dind
+# 2) Open a shell in the container
+#   $docker exec -it docker-build /bin/bash
+# 3) execute those comamnd inside the container
+#  #rm -rf cli docker-ce-packaging moby scan-cli-plugin
+#  #nohup bash -x mybuild.sh > logs.out 2>&1 & sleep 1; tail -f logs.out
+##
 
 REPO_LIST="https://github.com/docker/cli.git \
            https://github.com/moby/moby.git"
