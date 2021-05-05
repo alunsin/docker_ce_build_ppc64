@@ -5,7 +5,7 @@
 # - docker login
 # - skip deb/raspbian as this is for IOT, no ppc64
 # -ubuntu-groovy, fatal: unable to access 'https://github.com/rootless-containers/rootlesskit.git/': gnutls_handshake() failed: Error in the pull function.
-make[1]: *** [debian/rules:11: override_dh_auto_build] Error 128
+#make[1]: *** [debian/rules:11: override_dh_auto_build] Error 128
 # - ubuntu-hirsute, #8 2.894 Err:4 http://ports.ubuntu.com/ubuntu-ports hirsute-security InRelease
 #8 2.894   gpgv, gpgv2 or gpgv1 required for verification, but neither seems installed
 ##
