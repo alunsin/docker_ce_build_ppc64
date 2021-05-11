@@ -17,9 +17,11 @@
 #   $:~$ docker run -d -v ~/docker-ce:/docker-ce  --privileged  --name docker-build quay.io/alunsin/all_in_one_dind
 # 2) Open a shell in the container
 #   $docker exec -it docker-build /bin/bash
-# 3) execute those comamnd inside the container
+# 3) execute those comamnds inside the container
 #  #rm -rf cli docker-ce-packaging moby scan-cli-plugin
-#  #nohup bash -x mybuild.sh > logs.out 2>&1 & sleep 1; tail -f logs.out
+#  cp -r /docker-ce/.docker /root
+#  git clone https://github.com/alunsin/docker_ce_build_ppc64.git
+#  DATE=`date +%d%m%y-%H:%S`; export DATE && nohup bash -x docker_ce_build_ppc64/build_docker-ce.sh> logs_$DATE.out 2>&1 & sleep 1; tail -f logs_$DATE.out
 ##
 
 REPO_LIST="https://github.com/docker/cli.git \
