@@ -31,6 +31,21 @@ REF='v20.10.6'
 
 BUILD_OUT_DIR='/docker-ce'
 
+
+#Workaround for builkit cache issue where fedora-32/Dockerfile
+# (or the 1st Dockerfile used by buildkit) is used for all fedora's version
+# See https://github.com/moby/buildkit/issues/1368
+patchDockerFiles() {
+  Dockfiles="$(find $1  -name 'Dockerfile')"
+  d=$(date +%s)
+  i=0
+  for file in $Dockfiles; do
+      i=$(( i + 1 ))
+      echo "patching timestamp for $file"
+      touch -d @$(( d + i )) "$file"
+  done
+}
+
 if [ ! -d "$BUILD_OUT_DIR" ]; then
   echo "Build output directory does not exist ${DIR}"  >&2
   exit 1
@@ -56,8 +71,8 @@ cp -r moby/* docker-ce-packaging/src/github.com/docker/docker
 cp -r scan-cli-plugin/* docker-ce-packaging/src/github.com/docker/scan-cli-plugin
 
 echo "building rpms"
+patchDockerFiles .
 pushd docker-ce-packaging/rpm
-
 RPM_LIST=`ls -1d fedora-* rhel-* centos-*`
 for RPM in $RPM_LIST
 do
@@ -73,6 +88,7 @@ popd
 
 echo "building debs"
 pushd docker-ce-packaging/deb
+patchDockerFiles .
 DEB_LIST=`ls -1d debian-* ubuntu-* raspbian-*`
 for DEB in $DEB_LIST
 do
