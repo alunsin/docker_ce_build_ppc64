@@ -1,22 +1,21 @@
-ARG DISTRIB=fedora
-ARG VERSION=32
+#docker build -t als_test_centos8 --build-arg DISTRO_NAME=centos --build-arg DISTRO_VER=8 .
+ARG DISTRO_NAME=fedora
+ARG DISTRO_VER=32
+ARG DOCKER_CE_VER=20.10.6-3
+ARG CONTAINERD_VER=1.4.4-3.1
 
 ARG GOLANG_VERSION=1.15.2
 
 ARG LOCAL_WEB_SERVER="pwr-rt-bionic1:8080"
 
-# FROM golang:$GOLANG_VERSION AS builder
-# ARG TF_VERSION
-# ENV TF_VERSION ${TF_VERSION:-v0.12.29}
-
-# RUN go get rsc.io/goversion \
-#     && GO111MODULE=on go get github.com/hashicorp/terraform@$TF_VERSION
-
-FROM ppc64le/$DISTRIB:$VERSION
+FROM ppc64le/$DISTRO_NAME:$DISTRO_VER
 
 ARG LOCAL_WEB_SERVER
 ARG GOLANG_VERSION
-#ENV LOCAL_WEB_SERVER ${LOCAL_WEB_SERVER:-localhost}
+ARG DOCKER_CE_VER
+ARG CONTAINERD_VER
+ARG DISTRO_NAME
+ARG DISTRO_VER
 
 WORKDIR /workspace
 RUN mkdir -p /workspace
@@ -24,12 +23,10 @@ ENV WORKSPACE=/workspace \
     TERM=xterm
 ENV PATH /usr/local/go/bin:$PATH
 
-RUN set -eux; dnf -y install wget make findutils
-RUN set -eux; wget ${LOCAL_WEB_SERVER}/docker-ce/fedora-32/RPMS/ppc64le/docker-ce-20.10.6-3.fc32.ppc64le.rpm &&\
-wget ${LOCAL_WEB_SERVER}/docker-ce/fedora-32/RPMS/ppc64le/docker-ce-cli-20.10.6-3.fc32.ppc64le.rpm &&\
-wget ${LOCAL_WEB_SERVER}/docker-ce/fedora-32/RPMS/ppc64le/docker-ce-rootless-extras-20.10.6-3.fc32.ppc64le.rpm &&\
-wget ${LOCAL_WEB_SERVER}/containerd/fedora/32/ppc64le/containerd.io-1.4.4-3.1.fc32.ppc64le.rpm &&\
-dnf -y install *.rpm
+RUN set -eux; yum -y install wget make gcc findutils
+RUN set -eux;wget -r -nd -Appc64le.rpm ${LOCAL_WEB_SERVER}/docker-ce/${DISTRO_NAME}-${DISTRO_VER}/RPMS/ppc64le/ &&\
+    wget -r -nd -Appc64le.rpm ${LOCAL_WEB_SERVER}/containerd/${DISTRO_NAME}/${DISTRO_VER}/ppc64le/ &&\
+    yum -y localinstall *.rpm
 
 ##
 #Docker in Docker inspired from
@@ -56,11 +53,11 @@ RUN set -eux; \
 
 
 RUN set -eux; \
-OUTDIR=${WORKSPACE}/test/src/github.ibm.com/powercloud ; \
-mkdir -p $OUTDIR && cd $OUTDIR &&\
-wget http://${LOCAL_WEB_SERVER}/dockertest.tar.gz &&\
-tar -xvzf dockertest.tar.gz &&\
-rm dockertest.tar.gz
+    OUTDIR=${WORKSPACE}/test/src/github.ibm.com/powercloud ; \
+    mkdir -p $OUTDIR && cd $OUTDIR &&\
+    wget http://${LOCAL_WEB_SERVER}/dockertest.tar.gz &&\
+    tar -xvzf dockertest.tar.gz &&\
+    rm dockertest.tar.gz
 
 RUN set -eux; \
 	url="https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-ppc64le.tar.gz";\
