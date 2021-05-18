@@ -5,7 +5,7 @@ cat <<'EOF'>> launch_test.sh
 export GOPATH=${WORKSPACE}/test:/go
 export GO111MODULE=auto
 cd /workspace/test/src/github.ibm.com/powercloud/dockertest
-make test WHAT="./tests/ubuntu" GOFLAGS="-v"
+make test WHAT="./tests/$1" GOFLAGS="-v"
 EOF
 cp ~/.docker/config.json ./config.json
               mkdir Test_Result
@@ -24,7 +24,7 @@ ENV TF_VERSION ${TF_VERSION:-v0.12.29}
 RUN go get rsc.io/goversion \
     && GO111MODULE=on go get github.com/hashicorp/terraform@$TF_VERSION
 
-FROM ppc64le/ubuntu:$IMAGE
+FROM ppc64le/$IMAGE
 
 ARG GOLANG_VERSION
 ENV GOLANG_VERSION ${GOLANG_VERSION:-1.15.2}
@@ -75,11 +75,12 @@ RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.15.2.linux-ppc64le.tar.gz
 RUN export PATH=$PATH:/usr/local/go/bin
 
 ARG DISTRO
+ARG DISTRIB
 RUN mkdir /root/.docker/
 COPY config.json /root/.docker/
-ADD ./package2test/containerd/ubuntu/$DISTRO/ppc64el/containerd.io_1.4.4-1_ppc64el.deb ./
-ADD ./package2test/docker-ce/ubuntu-$DISTRO/docker-ce-cli_20.10.6~3-0~ubuntu-$DISTRO\_ppc64el.deb ./
-ADD ./package2test/docker-ce/ubuntu-$DISTRO/docker-ce_20.10.6~3-0~ubuntu-$DISTRO\_ppc64el.deb ./
+ADD ./package2test/containerd/$DISTRIB/$DISTRO/ppc64el/containerd.io_1.4.4-1_ppc64el.deb ./
+ADD ./package2test/docker-ce/$DISTRIB-$DISTRO/docker-ce-cli_20.10.6~3-0~$DISTRIB-$DISTRO\_ppc64el.deb ./
+ADD ./package2test/docker-ce/$DISTRIB-$DISTRO/docker-ce_20.10.6~3-0~$DISTRIB-$DISTRO\_ppc64el.deb ./
 # ADD containerd.io_1.4.4-1_ppc64el.deb ./
 # ADD docker-ce-cli_20.10.6~3-0~ubuntu-bionic_ppc64el.deb ./
 # ADD docker-ce_20.10.6~3-0~ubuntu-bionic_ppc64el.deb ./
@@ -87,8 +88,8 @@ ADD launch_test.sh /
 RUN chmod a+x /launch_test.sh
 RUN apt update && apt install -f && apt install -y jq curl iptables libdevmapper1.02.1 wget &&\
     dpkg -i ./containerd.io_1.4.4-1_ppc64el.deb &&\
-    dpkg -i ./docker-ce-cli_20.10.6~3-0~ubuntu-$DISTRO\_ppc64el.deb &&\
-    dpkg -i ./docker-ce_20.10.6~3-0~ubuntu-$DISTRO\_ppc64el.deb &&\
+    dpkg -i ./docker-ce-cli_20.10.6~3-0~$DISTRIB-$DISTRO\_ppc64el.deb &&\
+    dpkg -i ./docker-ce_20.10.6~3-0~$DISTRIB-$DISTRO\_ppc64el.deb &&\
     dockerd -v /var/run/docker.sock:/var/run/docker.sock
 ##
 #Docker in Docker inspired from
@@ -120,15 +121,19 @@ EXPOSE 2375 2376
 ENTRYPOINT ["dockerd-entrypoint.sh"]
 EOF
 
-                    #UBUNTU_DISTS=bionic xenial focal
-                    #for DISTROS in $UBUNTU_DISTS
-                    for DISTROS in bionic xenial focal
+                    for DISTROS in hirsute
                     do
-                      docker build --build-arg IMAGE=$DISTROS --build-arg DISTRO=$DISTROS . >> outputtemps.txt
+                      if [ X"$DISTROS" = Xbullseye ] || [ X"$DISTROS" = Xbuster ]
+                      then
+                        DISTRIB=debian
+                      else
+                        DISTRIB=ubuntu
+                      fi
+                      docker build --build-arg IMAGE=$DISTRIB:$DISTROS --build-arg DISTRO=$DISTROS --build-arg DISTRIB=$DISTRIB . >> outputtemps.txt
                       IMGBUILD=$(tail -1 outputtemps.txt | sed -e "s/^Successfully built //")
                       #if docker build --build-arg IMAGE=$DISTROS --build-arg DISTRO=$DISTROS . ; then echo "Test Successful for ubuntu:"$DISTROS"">>./Test_Result/test_result.txt; else echo "Test failed for ubuntu:"$DISTROS"">>./Test_Result/test_result.txt; fi
                     docker run -d -v ~/package2test/dockertest:/workspace/test/src/github.ibm.com/powercloud/dockertest --privileged --name docker-test-ub $IMGBUILD
-                    docker exec -it docker-test-ub /bin/bash /launch_test.sh >> ./Test_Result/test_result_ubuntu_$DISTROS.txt
+                    docker exec -it docker-test-ub /bin/bash /launch_test.sh $DISTRIB >> ./Test_Result/test_result_$DISTRIB\_$DISTROS.txt
                     docker stop docker-test-ub
                     docker rm docker-test-ub
                     rm outputtemps.txt
