@@ -36,7 +36,7 @@ pushd tmp
 ##
 # Populate launch test script to be included in the test image
 ##
-cat <<'EOF'>> launch_test.sh
+cat <<'EOF'> launch_test.sh
 #/bin/bash
 
 set -ue
