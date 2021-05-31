@@ -23,7 +23,7 @@ ENV WORKSPACE=/workspace \
     TERM=xterm
 ENV PATH /usr/local/go/bin:$PATH
 
-RUN set -eux; yum -y install wget make gcc findutils
+RUN set -eux; yum -y install wget make gcc findutils procps-ng
 RUN set -eux;wget -r -nd -Appc64le.rpm ${LOCAL_WEB_SERVER}/docker-ce/${DISTRO_NAME}-${DISTRO_VER}/RPMS/ppc64le/ &&\
     wget -r -nd -Appc64le.rpm ${LOCAL_WEB_SERVER}/containerd/${DISTRO_NAME}/${DISTRO_VER}/ppc64le/ &&\
     yum -y localinstall *.rpm
@@ -65,6 +65,9 @@ RUN set -eux; \
     tar -C /usr/local -xzf go.tgz; \
     rm go.tgz; \
     go version;
+
+COPY launch_test.sh /
+RUN chmod a+x /launch_test.sh
 
 VOLUME /var/lib/docker
 EXPOSE 2375 2376
