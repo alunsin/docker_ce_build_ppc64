@@ -19,12 +19,12 @@
 ##
 set -eux
 
-#List of RPM based and DEB based distros
+##
+#List of RPM based and DEB based distros to test
+##
 RPMS="fedora:32 fedora:33 fedora:33 centos:6 centos:7"
 DEBS="debian:bullseye debian:buster\
       ubuntu:bionic ubuntu:focal ubuntu:xenial ubuntu:groovy ubuntu:hirsute"
-RPMS="fedora:32"
-DEBS="debian:bullseye"
 
 LOCAL_WEB_SERVER="pwr-rt-bionic1:8080"
 
