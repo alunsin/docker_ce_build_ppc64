@@ -80,30 +80,53 @@ echo "End of the docker test suite"
 EOF
 
 #for PACKTYPE in RPMS DEBS; do
-for PACKTYPE in DEBS RPMS; do
-  echo "Looking for: $PACKTYPE"
+for PACKTYPE in RPMS DEBS; do
+  echo "* Looking for distro type: $PACKTYPE"
   cp ../$PACKTYPE/Dockerfile .
 
   for DISTRO in ${!PACKTYPE} ; do
-    echo $DISTRO
+
+    echo "** Looking for $DISTRO"
     DISTRO_NAME="$(cut -d':' -f1 <<<"$DISTRO")"
     DISTRO_VER="$(cut -d':' -f2 <<<"$DISTRO")"
-    echo "$DISTRO_NAME -- $DISTRO_NAME"
     IMAGE_NAME="t_docker_${DISTRO_NAME}_${DISTRO_VER}"
     CONT_NAME="t_docker_run_${DISTRO_NAME}_${DISTRO_VER}"
     BUILD_LOG=build_${DISTRO_NAME}_${DISTRO_VER}.log
     TEST_LOG=test_${DISTRO_NAME}_${DISTRO_VER}.log
 
-    echo "Building the test image: $IMAGE_NAME"
+    echo "*** Building the test image: $IMAGE_NAME"
     docker build -t $IMAGE_NAME --build-arg DISTRO_NAME=$DISTRO_NAME --build-arg DISTRO_VER=$DISTRO_VER \
-          --build-arg LOCAL_WEB_SERVER=$LOCAL_WEB_SERVER . 2>&1 |tee  ../result/$BUILD_LOG
+          --build-arg LOCAL_WEB_SERVER=$LOCAL_WEB_SERVER . &> ../result/$BUILD_LOG
 
-    echo "Runing the tests from the container: $CONT_NAME"
+    if [[ $? -ne 0 ]]; then
+      echo "ERROR: docker build failed for $DISTRO, see details below from '$BUILD_LOG'"
+      tail ../result/$BUILD_LOG
+      continue
+    fi
+
+    echo "*** Runing the tests from the container: $CONT_NAME"
     docker run -d -v ~/.docker:/root/.docker --privileged  --name $CONT_NAME $IMAGE_NAME
-    docker exec -it $CONT_NAME /bin/bash /launch_test.sh $DISTRO_NAME 2>&1 | tee ../result/$TEST_LOG
+
+    if [[ $? -ne 0 ]]; then
+      echo "ERROR: docker run failed for $DISTRO. Calling docker logs $CONT_NAME"
+      docker logs $CONT_NAME
+
+      echo "*** Cleanup: $CONT_NAME"
+      docker stop $CONT_NAME
+      docker rm $CONT_NAME
+      continue
+    fi
+
+    docker exec -it $CONT_NAME /bin/bash /launch_test.sh $DISTRO_NAME  &> ../result/$TEST_LOG
+    if [[ $? -ne 0 ]]; then
+      echo "ERROR: The test suite failed for $DISTRO. See details below from '$TEST_LOG'"
+      tail ../result/$TEST_LOG
+    fi
+
+    echo "*** Grepping for any potential tests errors from $TEST_LOG"
     grep -i err  ../result/$TEST_LOG
 
-    echo "Cleanup: $CONT_NAME"
+    echo "*** Cleanup: $CONT_NAME"
     docker stop $CONT_NAME
     docker rm $CONT_NAME
     docker image rm $IMAGE_NAME
