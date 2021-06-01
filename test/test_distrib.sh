@@ -17,12 +17,12 @@
 # (cd /package2test/ && nohup python3 -m http.server 8080 > ~/http.log  2>&1) &
 #
 ##
-set -eux
+#set -eux
 
 ##
 #List of RPM based and DEB based distros to test
 ##
-RPMS="fedora:32 fedora:33 fedora:33 centos:6 centos:7"
+RPMS="fedora:32 fedora:33 fedora:33 centos:7 centos:8"
 DEBS="debian:bullseye debian:buster\
       ubuntu:bionic ubuntu:focal ubuntu:xenial ubuntu:groovy ubuntu:hirsute"
 
@@ -89,8 +89,8 @@ for PACKTYPE in DEBS RPMS; do
     DISTRO_NAME="$(cut -d':' -f1 <<<"$DISTRO")"
     DISTRO_VER="$(cut -d':' -f2 <<<"$DISTRO")"
     echo "$DISTRO_NAME -- $DISTRO_NAME"
-    IMAGE_NAME="t_docker_${DISTRO_VER}_${DISTRO_NAME}"
-    CONT_NAME="t_docker_run_${DISTRO_VER}_${DISTRO_NAME}"
+    IMAGE_NAME="t_docker_${DISTRO_NAME}_${DISTRO_VER}"
+    CONT_NAME="t_docker_run_${DISTRO_NAME}_${DISTRO_VER}"
     BUILD_LOG=build_${DISTRO_NAME}_${DISTRO_VER}.log
     TEST_LOG=test_${DISTRO_NAME}_${DISTRO_VER}.log
 
