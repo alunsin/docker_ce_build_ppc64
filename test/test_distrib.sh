@@ -117,7 +117,7 @@ for PACKTYPE in RPMS DEBS; do
       continue
     fi
 
-    docker exec -it $CONT_NAME /bin/bash /launch_test.sh $DISTRO_NAME  &> ../result/$TEST_LOG
+    docker exec $CONT_NAME /bin/bash /launch_test.sh $DISTRO_NAME  &> ../result/$TEST_LOG
     if [[ $? -ne 0 ]]; then
       echo "ERROR: The test suite failed for $DISTRO. See details below from '$TEST_LOG'"
       tail ../result/$TEST_LOG
