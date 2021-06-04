@@ -1,7 +1,9 @@
 #/bin/bash
 
-###
-#TODO
+
+DATE=`date +%d%m%y-%H%S`
+BUILD_OUT_DIR="/docker-ce/containerd-$DATE"
+mkdir $BUILD_OUT_DIR
 
 
 git clone https://github.com/docker/containerd-packaging.git
@@ -26,4 +28,4 @@ do
 	make REF=${TAG} docker.io/library/$DISTRO
 done
 
-
+cp -r containerd-packaging/build/* $BUILD_OUT_DIR
