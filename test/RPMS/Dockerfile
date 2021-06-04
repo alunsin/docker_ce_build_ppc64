@@ -24,7 +24,7 @@ ENV WORKSPACE=/workspace \
 ENV PATH /usr/local/go/bin:$PATH
 
 RUN set -eux; yum -y install wget make gcc findutils procps-ng
-RUN set -eux;wget ${LOCAL_WEB_SERVER}/docker-ce/bundles-ce-${DISTRO_NAME}-${DISTRO_VER}-ppc64le.tar.gz/ &&\
+RUN set -eux;wget ${LOCAL_WEB_SERVER}/docker-ce/bundles-ce-${DISTRO_NAME}-${DISTRO_VER}-ppc64le.tar.gz &&\
     tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 6 '*/RPMS/*' &&\
     wget -r -nd -Appc64le.rpm ${LOCAL_WEB_SERVER}/containerd/${DISTRO_NAME}/${DISTRO_VER}/ppc64le/ &&\
     yum -y localinstall *.rpm
