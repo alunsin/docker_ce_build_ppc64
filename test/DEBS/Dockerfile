@@ -52,7 +52,8 @@ RUN if [ -f /bin/rpm  ] ; \
         rm -rf /var/lib/apt/lists/* ;\
     fi
 
-RUN set -eux;wget -r -nd -Appc64el.deb ${LOCAL_WEB_SERVER}/docker-ce/${DISTRO_NAME}-${DISTRO_VER}/ &&\
+RUN set -eux;wget ${LOCAL_WEB_SERVER}/docker-ce/bundles-ce-${DISTRO_NAME}-${DISTRO_VER}-ppc64le.tar.gz/ &&\
+    tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 4 '*.deb' &&\
     wget -r -nd -Appc64el.deb ${LOCAL_WEB_SERVER}/containerd/${DISTRO_NAME}/${DISTRO_VER}/ppc64el/ &&\
     dpkg -i *.deb
 
