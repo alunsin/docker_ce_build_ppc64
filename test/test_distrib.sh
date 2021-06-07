@@ -31,6 +31,10 @@ LOCAL_WEB_SERVER="pwr-rt-bionic1:8080"
 if [[ ! -d "result" ]] ; then mkdir result; fi
 if [[ ! -d "tmp" ]] ; then mkdir tmp; fi
 
+DATE=`date +%d%m%y-%H%S`
+BUILD_OUT_DIR="/docker-ce/test-$DATE"
+mkdir $BUILD_OUT_DIR
+
 pushd tmp
 
 ##
@@ -136,3 +140,5 @@ done
 
 #popd (tmp)
 popd
+
+cp -r result  $BUILD_OUT_DIR
