@@ -28,4 +28,5 @@ do
 	make REF=${TAG} docker.io/library/$DISTRO
 done
 
+cd -
 cp -r containerd-packaging/build/* $BUILD_OUT_DIR
