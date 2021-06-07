@@ -79,7 +79,6 @@ make test WHAT="./tests/$1" GOFLAGS="-v"
 echo "End of the docker test suite"
 EOF
 
-#for PACKTYPE in RPMS DEBS; do
 for PACKTYPE in RPMS DEBS; do
   echo "* Looking for distro type: $PACKTYPE"
   cp ../$PACKTYPE/Dockerfile .
