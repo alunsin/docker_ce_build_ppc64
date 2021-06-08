@@ -19,7 +19,7 @@ fi
 
 export DEBS="ubuntu:xenial ubuntu:bionic ubuntu:focal ubuntu:hirsute ubuntu:groovy"
 export DEBS="$DEBS debian:bullseye debian:buster"
-export RPMS="centos:7 centos:8 fedora:32 fedora:33 fedora:34 rhel:7"
+export RPMS="centos:7 centos:8 fedora:32 fedora:33 fedora:34"
 
 export DISTROS="$DEBS $RPMS"
 

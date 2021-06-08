@@ -68,7 +68,7 @@ popd
 echo "building debs"
 pushd docker-ce-packaging/deb
 patchDockerFiles .
-DEB_LIST=`ls -1d debian-* ubuntu-* raspbian-*`
+DEB_LIST=`ls -1d debian-* ubuntu-*`
 for DEB in $DEB_LIST
 do
  echo ""
@@ -83,7 +83,7 @@ popd
 echo "building rpms"
 pushd docker-ce-packaging/rpm
 patchDockerFiles .
-RPM_LIST=`ls -1d fedora-* rhel-* centos-*`
+RPM_LIST=`ls -1d fedora-* centos-*`
 for RPM in $RPM_LIST
 do
  
