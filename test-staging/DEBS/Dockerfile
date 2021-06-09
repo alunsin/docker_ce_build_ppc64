@@ -58,11 +58,6 @@ RUN set -eux; curl -fsSL https://download-stage.docker.com/linux/${DISTRO_NAME}/
     | tee /etc/apt/sources.list.d/docker.list > /dev/null  &&\
     apt-get update && apt-get -y install docker-ce docker-ce-cli containerd.io
 
-RUN set -eux;wget ${LOCAL_WEB_SERVER}/docker-ce/bundles-ce-${DISTRO_NAME}-${DISTRO_VER}-ppc64le.tar.gz &&\
-    tar -xvzf bundles-*.tar.gz --wildcards  --strip-components 4 '*.deb' &&\
-    wget -r -nd -Appc64el.deb ${LOCAL_WEB_SERVER}/containerd/${DISTRO_NAME}/${DISTRO_VER}/ppc64el/ &&\
-    dpkg -i *.deb
-
 ##
 #Docker in Docker inspired from
 #  https://github.com/docker-library/docker/tree/master/20.10/dind
