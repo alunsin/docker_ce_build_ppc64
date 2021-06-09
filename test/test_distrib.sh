@@ -22,7 +22,7 @@
 ##
 #List of RPM based and DEB based distros to test
 ##
-RPMS="fedora:32 fedora:33 fedora:34 centos:7 centos:8 rhel:7"
+RPMS="fedora:32 fedora:33 fedora:34 centos:7 centos:8"
 DEBS="debian:bullseye debian:buster\
       ubuntu:bionic ubuntu:focal ubuntu:xenial ubuntu:groovy ubuntu:hirsute"
 
