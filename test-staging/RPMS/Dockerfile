@@ -28,7 +28,7 @@ RUN set -eux; yum -y install wget make gcc findutils procps-ng
 #Install from Docekr-ce staging
 RUN set -eux; yum install -y yum-utils &&\
 yum-config-manager --add-repo https://download-stage.docker.com/linux/${DISTRO_NAME}/docker-ce-staging.repo &&\
-yum install docker-ce docker-ce-cli containerd.io
+yum -y install docker-ce docker-ce-cli containerd.io
 
 ##
 #Docker in Docker inspired from
