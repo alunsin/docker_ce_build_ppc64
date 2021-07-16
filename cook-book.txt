@@ -29,10 +29,32 @@ docker info 2>&1 | grep -e User -e Proxy
 ##
 # Run the containerd script from github and pass the version we want to build (ie v1.4.6)
 ##
+
 git clone https://github.com/alunsin/docker_ce_build_ppc64.git
 SCRIPT='docker_ce_build_ppc64/build_containerd.sh v1.4.6';
 DATE=`date +%d%m%y-%H%S`; export DATE && nohup bash -x  $SCRIPT> logs_$DATE.out 2>&1 & sleep 1; tail -f logs_$DATE.out
 
+##
+# Build docker_ce
+##
+CONT_NAME=docker-build_local_docker_ce
+docker run -d -v ~/docker-ce:/docker-ce -v  ~/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build
+
+##
+#From the container shell
+##
+docker exec -it $CONT_NAME /bin/bash
+
+#  #rm -rf cli docker-ce-packaging moby scan-cli-plugin
+git clone https://github.com/alunsin/docker_ce_build_ppc64.git
+
+#Edit version number and packaging tag/hash in build_docker-ce.sh as below:
+# - REF='v20.10.7'
+# - PACKAGING_REF='2455a897c45a7ab7f155950d3f69f28147c1526f'
+DATE=`date +%d%m%y-%H%S`; export DATE && nohup bash -x docker_ce_build_ppc64/build_docker-ce.sh> logs_$DATE.out 2>&1 & sleep 1; tail -f logs_$DATE.out
+
+
+------
 
 ##
 # Run the containerd script from github validation test
