@@ -56,12 +56,7 @@ DATE=`date +%d%m%y-%H%S`; export DATE && nohup bash -x docker_ce_build_ppc64/bui
 
 ------
 
-##
-# Run the containerd script from github validation test
-##
-cd docker_ce_build_ppc64/test
-SCRIPT='test_distrib.sh';
-DATE=`date +%d%m%y-%H%S`; export DATE && nohup bash -x  $SCRIPT> logs_$DATE.out 2>&1 & sleep 1; tail -f logs_$DATE.out
+
 
 ##
 # Push to /package2test dir for testing, update symbolic link
@@ -70,6 +65,12 @@ sudo cp -r containerd-070621-1040 /package2test/
 sudo rm  /package2test/containerd
 sudo ln -s /package2test/containerd-070621-1040 /package2test/containerd
 
+##
+# Run the containerd script from github validation test
+##
+cd docker_ce_build_ppc64/test
+SCRIPT='test_distrib.sh';
+DATE=`date +%d%m%y-%H%S`; export DATE && nohup bash -x  $SCRIPT> logs_$DATE.out 2>&1 & sleep 1; tail -f logs_$DATE.out
 
 ##
 # Launch validation tests in a container
@@ -96,7 +97,7 @@ docker stop $CONT_NAME && docker rm $CONT_NAME
 
 ##
 # Create a container to push to COS bucket
-# Requires s3fs >= 1.88, such as the one available from the debian:bullseye
+# Requires s3fs version >= 1.88, such as the one available from the debian:bullseye
 ##
 CONT_NAME=docker_s3_copy
 docker run -it -v ~/docker-ce:/docker-ce -v /package2test:/package2test --privileged --name $CONT_NAME debian:bullseye bash
@@ -113,6 +114,13 @@ s3fs  ibm-docker-builds /mnt/s3_ibm-docker-builds -o url=https://s3.us-east.clou
 # Set the docker and containerd version without the last digit (patch number)
 # Build tag is a manual increment
 ##
+
+#Sample command to get the sorted list of existing directories for containerd-1.4-*
+(cd /mnt/s3_ibm-docker-builds && ls -1d containerd-1.4-* | sort --version-sort)
+
+#Sample command to get the sorted list of existing directories for docker-ce-20.10-*
+(cd /mnt/s3_ibm-docker-builds && ls -1d docker-ce-20.10-* | sort --version-sort)
+
 DOCKER_CE_VER="20.10"
 DOCKER_CE_BUILD_TAG="4"
 CONTAINERD_VER="1.4"
