@@ -45,7 +45,7 @@ cat <<'EOF'> launch_test.sh
 
 set -ue
 
-echo "Waiting fo docerkd to start"
+echo "Waiting fo dockerd to start"
 TIMEOUT=10
 DAEMON="dockerd"
 i=0
