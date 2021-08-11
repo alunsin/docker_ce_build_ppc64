@@ -173,33 +173,14 @@ NEXT_BUILD_TAG=$((LAST_BUILD_TAG+1))
 CONT_NAME=docker_test_staging
 docker run -it -v ~/docker-ce:/docker-ce -v /package2test:/package2test --privileged --name $CONT_NAME debian:bullseye bash
 
-#From https://docs.docker.com/engine/install/debian/
-apt-get update && apt-get -y install \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg \
-    lsb-release
-curl -fsSL https://download-stage.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-echo \
-  "deb [arch=ppc64el signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download-stage.docker.com/linux/debian \
-  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-#deb [arch=ppc64el signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download-stage.docker.com/linux/debian   bullseye stable
-apt-get update && apt-get -y install docker-ce docker-ce-cli containerd.io
-
----
-CONT_NAME=docker-test_staging_docker
-docker run -d -v ~/docker-ce:/docker-ce -v  ~/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build
-docker exec -it $CONT_NAME /bin/bash
 
 ##
-# Run the containerd script from github validation test
+# Run the containerd script from github validation test (staging website)
 ##
 git clone https://github.com/alunsin/docker_ce_build_ppc64.git
 cd docker_ce_build_ppc64/test-staging
 SCRIPT='test_distrib.sh';
 DATE=`date +%d%m%y-%H%S`; export DATE && nohup bash -x  $SCRIPT> logs_$DATE.out 2>&1 & sleep 1; tail -f logs_$DATE.out
-mkdir /docker-ce/test_packages_$DATE
 cp -r result logs_$DATE.out  /docker-ce/test-staging_$DATE
 
 ##Parallel testing
@@ -207,7 +188,14 @@ CONT_NAME=docker-test_staging_docker_2
 docker run -d -v ~/docker-ce:/docker-ce -v  ~/docker-ce/.docker:/root/.docker --privileged  --name $CONT_NAME docker_ce_build
 docker exec -it $CONT_NAME /bin/bash
 
-
+##
+# Run the containerd script from github validation test (production website)
+##
+git clone https://github.com/alunsin/docker_ce_build_ppc64.git
+cd docker_ce_build_ppc64/test-prod
+SCRIPT='test_distrib.sh';
+DATE=`date +%d%m%y-%H%S`; export DATE && nohup bash -x  $SCRIPT> logs_$DATE.out 2>&1 & sleep 1; tail -f logs_$DATE.out
+cp -r result logs_$DATE.out  /docker-ce/test-prod_$DATE
 ---
 ##
 # TODOS
